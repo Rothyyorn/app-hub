@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { posts } from '../data/posts';
 import { motion } from 'motion/react';
+import ReactMarkdown from 'react-markdown';
 import { ArrowLeft, ExternalLink, Maximize2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -53,14 +54,14 @@ export default function Post() {
         
       </header>
 
-      {/* Featured Image or Web View */}
+      {/* Featured Image, Video or Web View */}
       <div className={cn(
         "relative rounded-[3rem] overflow-hidden shadow-2xl shadow-primary/10 border border-white/5 bg-[#1A1A1A] transition-all duration-500",
         isFullScreen 
           ? "fixed inset-0 z-[100] rounded-none h-screen w-screen" 
-          : post.externalUrl ? "h-[85vh] min-h-[600px]" : "aspect-video md:aspect-[21/9]"
+          : (post.displayMode === 'iframe' || (!post.displayMode && post.externalUrl)) ? "h-[85vh] min-h-[600px]" : "aspect-video md:aspect-[21/9]"
       )}>
-        {post.externalUrl ? (
+        {(post.displayMode === 'iframe' || (!post.displayMode && post.externalUrl)) && post.externalUrl ? (
           <div className="w-full h-full flex flex-col">
             <div className="bg-[#1A1A1A]/80 backdrop-blur-md border-b border-white/5 p-4 flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -99,6 +100,16 @@ export default function Post() {
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
             />
           </div>
+        ) : (post.displayMode === 'video' || (!post.displayMode && post.videoUrl)) && post.videoUrl ? (
+          <video 
+            src={post.videoUrl}
+            className="w-full h-full object-cover"
+            controls
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
         ) : (
           <img 
             src={post.coverImage} 
@@ -107,6 +118,13 @@ export default function Post() {
             referrerPolicy="no-referrer"
           />
         )}
+      </div>
+
+      {/* Content */}
+      <div className="mt-24 max-w-3xl mx-auto">
+        <div className="markdown-body">
+          <ReactMarkdown>{post.content}</ReactMarkdown>
+        </div>
       </div>
     </motion.article>
   );

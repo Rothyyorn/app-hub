@@ -18,7 +18,7 @@
 
 /* Markdown Styling */
 .markdown-body {
-  @apply leading-relaxed text-lg text-black/80;
+  @apply leading-relaxed text-lg text-white/70;
 }
 
 .markdown-body h1 {
@@ -46,7 +46,7 @@
 }
 
 .markdown-body blockquote {
-  @apply border-l-4 border-primary pl-6 py-2 italic my-8 text-black/60 bg-secondary;
+  @apply border-l-4 border-primary pl-6 py-2 italic my-8 text-white/60 bg-white/5;
 }
 
 .markdown-body code {
@@ -62,7 +62,7 @@
 }
 
 .markdown-body strong {
-  @apply font-bold text-black;
+  @apply font-bold text-white;
 }
 
 .markdown-body em {

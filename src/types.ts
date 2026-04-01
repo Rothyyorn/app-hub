@@ -7,5 +7,7 @@ export interface Post {
   category: string;
   readTime: string;
   coverImage: string;
+  videoUrl?: string;
   externalUrl?: string;
+  displayMode?: 'video' | 'iframe' | 'image';
 }
