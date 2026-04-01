@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-primary: #FF6B00; /* Vibrant Orange */
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #FFF5EE; /* Shell/Warm White */
+}
+
+@layer base {
+  body {
+    @apply bg-[#0D0D0D] text-white;
+  }
+}
+
+/* Markdown Styling */
+.markdown-body {
+  @apply leading-relaxed text-lg text-black/80;
+}
+
+.markdown-body h1 {
+  @apply text-4xl font-serif italic font-bold mt-12 mb-6 text-primary;
+}
+
+.markdown-body h2 {
+  @apply text-3xl font-serif italic font-bold mt-10 mb-5 text-primary;
+}
+
+.markdown-body h3 {
+  @apply text-2xl font-serif italic font-bold mt-8 mb-4 text-primary;
+}
+
+.markdown-body p {
+  @apply mb-6;
+}
+
+.markdown-body ul {
+  @apply list-disc list-inside mb-6 space-y-2;
+}
+
+.markdown-body ol {
+  @apply list-decimal list-inside mb-6 space-y-2;
+}
+
+.markdown-body blockquote {
+  @apply border-l-4 border-primary pl-6 py-2 italic my-8 text-black/60 bg-secondary;
+}
+
+.markdown-body code {
+  @apply bg-primary/10 px-1.5 py-0.5 rounded font-mono text-sm text-primary;
+}
+
+.markdown-body pre {
+  @apply bg-[#1A1A1A] text-white p-6 rounded-xl my-8 overflow-x-auto font-mono text-sm leading-relaxed border-l-4 border-primary;
+}
+
+.markdown-body pre code {
+  @apply bg-transparent p-0 text-white;
+}
+
+.markdown-body strong {
+  @apply font-bold text-black;
+}
+
+.markdown-body em {
+  @apply italic;
+}
+
+.markdown-body img {
+  @apply w-full h-auto my-12 rounded-2xl shadow-lg;
+}
+
+.markdown-body hr {
+  @apply my-12 border-primary/10;
+}
+
+
