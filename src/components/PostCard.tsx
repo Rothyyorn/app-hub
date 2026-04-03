@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Post } from '../types';
 import { ArrowRight } from 'lucide-react';
+import HlsVideoPlayer from './HlsVideoPlayer';
 
 interface PostCardProps {
   post: Post;
@@ -52,13 +53,14 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
             />
           </div>
         ) : (post.displayMode === 'video' || (!post.displayMode && post.videoUrl)) && post.videoUrl ? (
-          <video 
+          <HlsVideoPlayer 
             src={post.videoUrl}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             autoPlay
             muted
             loop
             playsInline
+            poster={post.coverImage}
           />
         ) : (
           <img 

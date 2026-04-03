@@ -10,14 +10,26 @@ export const posts: Post[] = [
   
   {
     id: 'Viral',
-    title: '',
-    excerpt: '',
+    title: 'Jerriel Cry4zee Viral Video',
+    excerpt: 'The most talked-about video of the week featuring Jerriel Cry4zee.',
     content: portfolioMd,
     date: '2026-03-30',
     category: 'Viral',
-    readTime: '5M Videos',
-    coverImage: 'https://picsum.photos/seed/portfolio/1200/630',
+    readTime: '5M Views',
+    coverImage: null,
     videoUrl: 'https://cdn2.magixz.com/AlterPinay/Jerriel_Cry4zee/Jerriel_Cry4zee_21.mp4',
+    displayMode: 'video'
+  },
+  {
+    id: 'viral-hls',
+    title: 'Cheating a Business Trip with a Co-worker',
+    excerpt: 'Watch the latest viral stream from Cheating a Business Trip with a Co-worker',
+    content: 'Latest viral content stream.',
+    date: '2026-04-03',
+    category: 'Viral',
+    readTime: 'Live Stream',
+    coverImage: 'https://pix-cdn77.phncdn.com/c6251/videos/202603/25/43344875/original/019d26cf-d3f4-7c67-b6e2-b180b25cff18.jpg/plain/rs:fit:320:180?hash=0O8Nt10JToqSDsfp0d5eHZ0DLaU=&validto=1775314257',
+    videoUrl: 'https://ev-h.phncdn.com/hls/c6251/videos/202603/25/43344875/720P_4000K_43344875.mp4/master.m3u8?validfrom=1775224405&validto=1775231605&ipa=1&hdl=-1&hash=q3q0J8npdaaV0ATsdQSPfucOzzk%3D',
     displayMode: 'video'
   },
   // {

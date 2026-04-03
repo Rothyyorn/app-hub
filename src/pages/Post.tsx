@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import { ArrowLeft, ExternalLink, Maximize2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Helmet } from 'react-helmet-async';
+import HlsVideoPlayer from '../components/HlsVideoPlayer';
 
 export default function Post() {
   const { id } = useParams<{ id: string }>();
@@ -109,7 +110,7 @@ export default function Post() {
             />
           </div>
         ) : (post.displayMode === 'video' || (!post.displayMode && post.videoUrl)) && post.videoUrl ? (
-          <video 
+          <HlsVideoPlayer 
             src={post.videoUrl}
             className="w-full h-full object-cover"
             controls
@@ -117,6 +118,7 @@ export default function Post() {
             muted
             loop
             playsInline
+            poster={post.coverImage}
           />
         ) : (
           <img 
