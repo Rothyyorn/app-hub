@@ -4,6 +4,7 @@ import AdBanner from '../components/AdBanner';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 export default function Home() {
   return (
@@ -13,6 +14,10 @@ export default function Home() {
       transition={{ duration: 0.6 }}
       className="space-y-32"
     >
+      <Helmet>
+        <title>Viral Hub | Jerriel Cry4zee (Zyan Cabrera)</title>
+        <meta name="description" content="Latest viral videos and social media trends. Featuring Jerriel Cry4zee (Zyan Cabrera) and more." />
+      </Helmet>
       {/* Grid Section */}
       <section>
         <div className="flex items-center justify-between mb-8">

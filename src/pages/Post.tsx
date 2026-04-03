@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import { ArrowLeft, ExternalLink, Maximize2 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { Helmet } from 'react-helmet-async';
 
 export default function Post() {
   const { id } = useParams<{ id: string }>();
@@ -40,6 +41,13 @@ export default function Post() {
       transition={{ duration: 0.8 }}
       className="max-w-5xl mx-auto"
     >
+      <Helmet>
+        <title>{post.title || 'Viral Post'} | Viral Hub</title>
+        <meta name="description" content={post.excerpt || 'Latest viral video content.'} />
+        <meta property="og:title" content={post.title || 'Viral Post'} />
+        <meta property="og:description" content={post.excerpt || 'Latest viral video content.'} />
+        <meta property="og:image" content={post.coverImage} />
+      </Helmet>
       {/* Header */}
       <header className="space-y-10 mb-16">
         <Link to="/" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary hover:opacity-70 transition-opacity mb-8">
