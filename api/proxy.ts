@@ -20,12 +20,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Pass browser cookies to the target site
     const requestHeaders: any = {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
       "Accept-Language": "en-US,en;q=0.9",
-      "Referer": targetUrl,
+      "Cache-Control": "max-age=0",
+      "Sec-Ch-Ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+      "Sec-Ch-Ua-Mobile": "?0",
+      "Sec-Ch-Ua-Platform": '"Windows"',
       "Sec-Fetch-Dest": "document",
       "Sec-Fetch-Mode": "navigate",
-      "Sec-Fetch-Site": "cross-site",
+      "Sec-Fetch-Site": "none",
+      "Sec-Fetch-User": "?1",
       "Upgrade-Insecure-Requests": "1"
     };
 
@@ -36,13 +40,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const response = await fetch(targetUrl, {
       signal: controller.signal,
       headers: requestHeaders,
+      redirect: 'follow',
     });
 
     clearTimeout(timeout);
 
     if (!response.ok) {
       console.error(`Fetch failed for: ${targetUrl} [Status: ${response.status}]`);
-      throw new Error(`Target responded with status: ${response.status}`);
+      // Return a visual error page instead of a raw error string
+      return res.status(response.status).send(`
+        <div style="background:#0D0D0D;color:white;font-family:sans-serif;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;">
+          <h1 style="color:#FF5E00;font-size:24px;">PROXY ACCESS DENIED</h1>
+          <p style="opacity:0.6;font-size:14px;max-width:400px;">The target site (${targetUrl}) responded with status ${response.status}. This usually happens when the site blocks cloud provider IPs.</p>
+          <div style="margin-top:20px;padding:15px;background:rgba(255,255,255,0.05);border-radius:12px;font-size:12px;">
+            <strong>Pro Tip:</strong> Try refreshing or using a different bookmark.
+          </div>
+        </div>
+      `);
     }
 
     // Handle Set-Cookie headers for session persistence
