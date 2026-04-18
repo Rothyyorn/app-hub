@@ -84,6 +84,11 @@ async function startServer() {
             (function() {
               const PROXY_URL = window.location.origin + '/api/proxy?url=';
 
+              // 0. Immediate CSS Injection (Zero-Wall)
+              const style = document.createElement('style');
+              style.innerHTML = 'div[class*="modal"], div[class*="overlay"], div[id*="modal"], div[id*="overlay"], .join-modal, .registration-modal, .login-modal, #age-verification-container, .age-gate, div[class*="popup"], div[id*="popup"], .modal-dialog, .modal-backdrop, .nudge-container, [class*="AuthModal"], [id*="AuthModal"], div[style*="z-index: 2147483647"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; } html, body { overflow: auto !important; height: auto !important; position: static !important; }';
+              document.head ? document.head.appendChild(style) : document.documentElement.appendChild(style);
+
               // 1. Prevent Frame Busting
               try {
                 Object.defineProperty(window, 'top', { get: function() { return window.self; } });
@@ -216,10 +221,15 @@ async function startServer() {
                 lockAndRewrite();
                 observer.observe(document.body, { childList: true, subtree: true });
 
-                // 5. Hide Overlays & Ad-Blocker Detection
-                const style = document.createElement('style');
-                style.innerHTML = 'div[class*="modal"], div[class*="overlay"], div[id*="modal"], div[id*="overlay"], .join-modal, .registration-modal, .login-modal, #age-verification-container, .age-gate, div[class*="popup"], div[id*="popup"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; } html, body { overflow: auto !important; height: auto !important; }';
-                document.head.appendChild(style);
+                // Proactive Wall-Cleaner: Removes late-injected modals every 1s
+                setInterval(() => {
+                  const walls = document.querySelectorAll('.join-modal, .registration-modal, .login-modal, [class*="AuthModal"], [id*="AuthModal"], .modal-backdrop');
+                  walls.forEach(w => w.remove());
+                  if (document.body.style.overflow === 'hidden') {
+                    document.body.style.overflow = 'auto';
+                    document.body.style.height = 'auto';
+                  }
+                }, 1000);
               });
               
               const interval = setInterval(autoAccept, 500);
