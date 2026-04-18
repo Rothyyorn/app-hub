@@ -7,9 +7,9 @@ export interface Bookmark {
 
 export const bookmarks: Bookmark[] = [
   {
-    id: 'pornhub-home',
-    name: 'Pornhub Home',
-    url: 'https://www.pornhub.com/'
+    id: 'xhamster-home',
+    name: 'xHamster Home',
+    url: 'https://xhamster.com/'
   },
   {
     id: 'comatozze',

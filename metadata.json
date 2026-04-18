@@ -1,5 +1,9 @@
 {
-  "name": "Viral Hub | Jerriel Cry4zee (Zyan Cabrera)",
-  "description": "Latest viral videos and social media trends. Featuring Jerriel Cry4zee (Zyan Cabrera) and more.",
-  "requestFramePermissions": []
+  "name": "SEC",
+  "description": "Premium adult video hub and web explorer center.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
 }

@@ -13,6 +13,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const navLinks = [
     { name: 'Home', path: '/' },
+    { name: 'Explorer', path: '/explorer' },
     { name: 'Apps', path: '/' },
     { name: 'About', path: '#' },
   ];
@@ -26,10 +27,10 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2 group">
                 <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl rotate-3 group-hover:rotate-0 transition-transform">
-                  A
+                  S
                 </div>
                 <span className="text-xl font-bold tracking-tight">
-                  App Hub<span className="text-primary">.</span>
+                  SEC<span className="text-primary">.</span>
                 </span>
               </Link>
             </div>
@@ -87,8 +88,7 @@ export default function Layout({ children }: LayoutProps) {
       </nav>
 
       <main className={cn(
-        "mx-auto px-4 sm:px-6 lg:px-8 py-12",
-        location.pathname === '/' ? "max-w-none px-0 py-0" : "max-w-7xl"
+        location.pathname === '/' ? "w-full overflow-hidden" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
       )}>
         {children}
       </main>

@@ -8,6 +8,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Post from './pages/Post';
+import Explorer from './pages/Explorer';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/explorer" element={<Explorer />} />
             <Route path="/post/:id" element={<Post />} />
           </Routes>
         </Layout>
