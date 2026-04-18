@@ -22,6 +22,7 @@ interface HlsVideoPlayerProps {
   crossOrigin?: 'anonymous' | 'use-credentials';
   ariaHidden?: boolean;
   tabIndex?: number;
+  startTime?: number;
 }
 
 const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
@@ -37,6 +38,7 @@ const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
   crossOrigin,
   ariaHidden,
   tabIndex,
+  startTime = 0,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -48,6 +50,12 @@ const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
 
     const handlePlay = async () => {
       if (!isMounted || !video) return;
+      
+      // Apply start time if provided
+      if (startTime > 0) {
+        video.currentTime = startTime;
+      }
+
       try {
         await video.play();
       } catch (e) {

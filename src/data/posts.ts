@@ -16,7 +16,7 @@ export const posts: Post[] = [
     date: '2026-03-30',
     category: 'Viral',
     readTime: '5M Views',
-    coverImage: null,
+    coverImage: 'https://alterpinay.vip/wp-content/uploads/2026/02/Screenshot-2026-02-05-152940-577x1024.png',
     videoUrl: 'https://cdn2.magixz.com/AlterPinay/Jerriel_Cry4zee/Jerriel_Cry4zee_21.mp4',
     displayMode: 'video'
   },

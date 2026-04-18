@@ -18,7 +18,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
         to={`/post/${post.id}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="group relative block overflow-hidden rounded-[2.5rem] bg-[#1A1A1A] transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/20 mb-16"
+        className="group relative block overflow-hidden rounded-[1.5rem] bg-[#1A1A1A] transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/20 mb-16"
       >
         <div className="aspect-[21/9] overflow-hidden relative">
           <img 
@@ -37,6 +37,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
                 loop
                 playsInline
                 controls={false}
+                startTime={10}
               />
             </div>
           )}
@@ -80,6 +81,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
               playsInline
               controls={false}
               tracks={post.videoTracks}
+              startTime={10}
             />
           </div>
         )}
@@ -98,7 +100,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20" />
       </div>
-      <div className="p-2.5">
+      <div className="p-1.5">
         <h3 className="text-[9px] font-bold leading-tight text-white line-clamp-2 group-hover:text-primary transition-colors">
           {post.title}
         </h3>
