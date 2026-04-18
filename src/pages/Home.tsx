@@ -15,8 +15,8 @@ export default function Home() {
       className="space-y-24"
     >
       <Helmet>
-        <title>Viral Hub | Best Sex, Porn, VLXX, and XVideo Collection</title>
-        <meta name="description" content="Discover the most popular sex videos, porn content, VLXX, and XVideo favorites. Fast streaming, premium quality, and the latest viral hits in one place." />
+        <title>SexHub VLXX | Best Sex Video, Porn, VLXX, and XVideo Collection</title>
+        <meta name="description" content="Discover the most popular sex videos, porn content, VLXX, and XVideo favorites on SexHub VLXX." />
         <meta name="keywords" content="sex video, porn video, vlxx, xvideo, viral video, adult hub, premium porn" />
       </Helmet>
       {/* Grid Section */}

@@ -26,10 +26,10 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2 group">
                 <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl rotate-3 group-hover:rotate-0 transition-transform">
-                  A
+                  S
                 </div>
                 <span className="text-xl font-bold tracking-tight">
-                  App Hub<span className="text-primary">.</span>
+                  SexHub <span className="text-primary truncate">VLXX</span>
                 </span>
               </Link>
             </div>
