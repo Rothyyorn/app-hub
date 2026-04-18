@@ -12,10 +12,15 @@ interface PostCardProps {
 export default function PostCard({ post, featured = false }: PostCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
+  const handleRedirect = () => {
+    window.open('https://omg10.com/4/10893687', '_blank');
+  };
+
   if (featured) {
     return (
       <Link 
         to={`/post/${post.id}`}
+        onClick={handleRedirect}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="group relative block overflow-hidden rounded-[1.5rem] bg-[#1A1A1A] transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/20 mb-16"
@@ -58,6 +63,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
   return (
     <Link 
       to={`/post/${post.id}`}
+      onClick={handleRedirect}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="group relative block overflow-hidden rounded-2xl bg-[#1A1A1A] transition-all duration-500 hover:scale-105 hover:z-10 hover:shadow-2xl hover:shadow-primary/40"
