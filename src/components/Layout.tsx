@@ -86,7 +86,10 @@ export default function Layout({ children }: LayoutProps) {
         )}
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className={cn(
+        "mx-auto px-4 sm:px-6 lg:px-8 py-12",
+        location.pathname === '/' ? "max-w-none px-0 py-0" : "max-w-7xl"
+      )}>
         {children}
       </main>
     </div>
