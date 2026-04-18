@@ -104,14 +104,48 @@ async function startServer() {
                 return false;
               }
 
-              // 4. Navigation & Tab Locking
-              function lockTabs() {
-                document.querySelectorAll('a[target="_blank"]').forEach(a => a.target = '_self');
+              // 4. Navigation & Tab Locking + Mutation Tracking
+              function rewriteLink(a) {
+                if (!a || !a.href) return;
+                if (a.href.includes('/api/proxy') || a.href.startsWith('data:') || a.href.startsWith('javascript:')) return;
+                a.dataset.originalHref = a.href;
+                a.href = PROXY_URL + encodeURIComponent(a.href);
+                a.target = '_self';
               }
+
+              function lockAndRewrite() {
+                document.querySelectorAll('a').forEach(rewriteLink);
+                document.querySelectorAll('form').forEach(f => {
+                  if (f.action && !f.action.includes('/api/proxy')) {
+                    f.action = PROXY_URL + encodeURIComponent(f.action);
+                  }
+                });
+              }
+
+              // Intercept all clicks as a fallback
+              document.addEventListener('click', function(e) {
+                const a = e.target.closest('a');
+                if (a && a.href && !a.href.includes('/api/proxy')) {
+                  e.preventDefault();
+                  window.location.href = PROXY_URL + encodeURIComponent(a.href);
+                }
+              }, true);
+
+              const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                  mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) {
+                      if (node.tagName === 'A') rewriteLink(node);
+                      node.querySelectorAll('a').forEach(rewriteLink);
+                    }
+                  });
+                });
+              });
 
               window.addEventListener('DOMContentLoaded', () => {
                 autoAccept();
-                lockTabs();
+                lockAndRewrite();
+                observer.observe(document.body, { childList: true, subtree: true });
               });
               
               const interval = setInterval(autoAccept, 500);
@@ -151,8 +185,13 @@ async function startServer() {
         res.removeHeader("Frame-Options");
         res.send(body);
       } else {
-        // For non-HTML (like images/css), we can often just redirect or pipe
-        res.redirect(targetUrl);
+        // For non-HTML (images, css, js), return the raw buffer
+        res.set("Content-Type", contentType);
+        res.removeHeader("Content-Security-Policy");
+        res.removeHeader("X-Frame-Options");
+        res.removeHeader("Frame-Options");
+        const buffer = await response.arrayBuffer();
+        res.send(Buffer.from(buffer));
       }
     } catch (error: any) {
       console.error("Proxy error:", error);
