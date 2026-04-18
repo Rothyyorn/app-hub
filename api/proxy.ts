@@ -99,14 +99,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
             function autoAccept() {
               if (sessionStorage.getItem(sessionKey)) return true;
-              const keywords = ["I'M 18", "I AM 18", "ENTER", "CONFIRM AGE", "AGREE", "OLDER THAN 18", "YES", "PROCEED", "I AM AT LEAST 18", "I AGREE", "ENTER SITE", "ADULT CONTENT", "I'M OVER 18", "I AM OVER 18", "YES, I AM", "CONTINUE TO SITE"];
-              const buttons = Array.from(document.querySelectorAll('button, a, div[role="button"], span, input[type="button"], input[type="submit"]'));
+              
+              const keywords = [
+                "I'M 18", "I AM 18", "ENTER", "CONFIRM AGE", "AGREE", "OLDER THAN 18", 
+                "YES", "PROCEED", "I AM AT LEAST 18", "I AGREE", "ENTER SITE", "ADULT CONTENT",
+                "I'M OVER 18", "I AM OVER 18", "YES, I AM", "CONTINUE TO SITE",
+                "STAY AS GUEST", "NO THANKS", "SKIP", "CLOSE", "NOT NOW"
+              ];
+              
+              const buttons = Array.from(document.querySelectorAll('button, a, div[role="button"], span, input[type="button"], input[type="submit"], svg'));
+              
               for (const btn of buttons) {
                 const text = (btn.innerText || btn.textContent || btn.value || "").trim().toUpperCase();
-                if (keywords.some(k => text === k || text.includes(k))) {
+                // Special handling for common X icons or small close buttons
+                const isCloseIcon = btn.tagName === 'SVG' || btn.querySelector('svg');
+                
+                if (keywords.some(k => text === k || text.includes(k)) || (isCloseIcon && btn.classList.contains('close'))) {
                   try {
-                    sessionStorage.setItem(sessionKey, 'true');
-                    showAutomationBadge(text);
+                    // Only set session storage for real age gates, not temporary popups
+                    if (text.includes('18') || text.includes('ENTER') || text.includes('AGREE')) {
+                      sessionStorage.setItem(sessionKey, 'true');
+                      showAutomationBadge(text || "GATE DISMISSED");
+                    }
+                    
                     btn.click();
                     const clickEvent = new MouseEvent('click', { view: window, bubbles: true, cancelable: true });
                     btn.dispatchEvent(clickEvent);
@@ -138,6 +153,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               autoAccept();
               document.querySelectorAll('a').forEach(rewriteLink);
               observer.observe(document.body, { childList: true, subtree: true });
+
+              const style = document.createElement('style');
+              style.innerHTML = 'div[class*="modal"], div[class*="overlay"], div[id*="modal"], div[id*="overlay"], .join-modal, .registration-modal, .login-modal, #age-verification-container, .age-gate, div[class*="popup"], div[id*="popup"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; } html, body { overflow: auto !important; height: auto !important; }';
+              document.head.appendChild(style);
             });
             setInterval(autoAccept, 500);
           })();
