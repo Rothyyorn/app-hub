@@ -84,9 +84,9 @@ async function startServer() {
             (function() {
               const PROXY_URL = window.location.origin + '/api/proxy?url=';
 
-              // 0. Immediate CSS Injection (Zero-Wall)
+              // 0. Immediate CSS Injection (Surgical Zero-Wall)
               const style = document.createElement('style');
-              style.innerHTML = 'div[class*="modal"], div[class*="overlay"], div[id*="modal"], div[id*="overlay"], .join-modal, .registration-modal, .login-modal, #age-verification-container, .age-gate, div[class*="popup"], div[id*="popup"], .modal-dialog, .modal-backdrop, .nudge-container, [class*="AuthModal"], [id*="AuthModal"], .verification-modal, .age-verification, div[style*="z-index: 2147483647"], div[style*="z-index: 1000000"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; } html, body { overflow: auto !important; height: auto !important; position: static !important; }';
+              style.innerHTML = '[class*="modal-backdrop"], [class*="modal_backdrop"], [class*="fade-background"], [id*="age-gate"], [class*="age-gate"], [id*="verification-modal"], [class*="verification-modal"], .join-modal, .registration-modal, .login-modal, [class*="nudge-container"], [id*="nudge-container"], [style*="z-index: 2147483647"], [style*="z-index: 1000000"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; } html, body { overflow: auto !important; height: auto !important; position: static !important; }';
               document.head ? document.head.appendChild(style) : document.documentElement.appendChild(style);
 
               // 1. Prevent Frame Busting
@@ -221,28 +221,37 @@ async function startServer() {
                 lockAndRewrite();
                 observer.observe(document.body, { childList: true, subtree: true });
 
-                // Proactive Wall-Cleaner: Removes late-injected modals every 1s
-                setInterval(() => {
-                  const walls = document.querySelectorAll('.join-modal, .registration-modal, .login-modal, [class*="AuthModal"], [id*="AuthModal"], .modal-backdrop, .verification-modal, .age-gate, [id*="verification"]');
-                  walls.forEach(w => w.remove());
-                  
-                  // Deep-Kill: Find any child of body that contains "Join" and "free" and hide it
-                  Array.from(document.body.children).forEach(child => {
-                    if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'MAIN', 'HEADER', 'FOOTER'].includes(child.tagName)) return;
-                    const text = (child.innerText || child.textContent || "").toLowerCase();
-                    if (text.includes("join xhamster for free") || (text.includes("join") && text.includes("for free") && text.includes("sign up"))) {
-                      child.style.display = 'none';
-                      child.style.visibility = 'hidden';
-                    }
-                  });
+                  // Proactive Wall-Cleaner: Removes late-injected modals every 1s
+                  setInterval(() => {
+                    const walls = document.querySelectorAll('.join-modal, .registration-modal, .login-modal, [class*="AuthModal"], [id*="AuthModal"], .modal-backdrop, .verification-modal, .age-gate');
+                    walls.forEach(w => w.remove());
+                    
+                    // Surgical Deep-Kill: Only target elements that look like centered popups or full-screen walls
+                    Array.from(document.body.children).forEach(child => {
+                      if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'MAIN', 'HEADER', 'FOOTER', 'NAV', 'SECTION'].includes(child.tagName)) return;
+                      
+                      const text = (child.innerText || child.textContent || "").toLowerCase();
+                      const isModalContent = text.includes("join xhamster for free") || (text.includes("join") && text.includes("for free") && text.includes("sign up"));
+                      
+                      if (isModalContent) {
+                        // Check if it's likely a modal (short text, high z-index, or fixed position)
+                        const style = window.getComputedStyle(child);
+                        const isFixed = style.position === 'fixed' || style.position === 'absolute';
+                        
+                        if (isFixed || text.length < 2000) {
+                          child.style.display = 'none';
+                          child.style.visibility = 'hidden';
+                        }
+                      }
+                    });
 
-                  if (document.body.style.overflow === 'hidden' || document.documentElement.style.overflow === 'hidden') {
-                    document.body.style.overflow = 'auto';
-                    document.documentElement.style.overflow = 'auto';
-                    document.body.style.height = 'auto';
-                    document.body.style.position = 'static';
-                  }
-                }, 1000);
+                    if (document.body.style.overflow === 'hidden' || document.documentElement.style.overflow === 'hidden') {
+                      document.body.style.overflow = 'auto';
+                      document.documentElement.style.overflow = 'auto';
+                      document.body.style.height = 'auto';
+                      document.body.style.position = 'static';
+                    }
+                  }, 1000);
               });
               
               const interval = setInterval(autoAccept, 500);
