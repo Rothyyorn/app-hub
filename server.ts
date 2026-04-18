@@ -24,18 +24,25 @@ async function startServer() {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
+      // Pass browser cookies to the target site
+      const requestHeaders: any = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": targetUrl,
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "cross-site",
+        "Upgrade-Insecure-Requests": "1"
+      };
+
+      if (req.headers.cookie) {
+        requestHeaders["Cookie"] = req.headers.cookie;
+      }
+
       const response = await fetch(targetUrl, {
         signal: controller.signal,
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-          "Accept-Language": "en-US,en;q=0.9",
-          "Referer": targetUrl,
-          "Sec-Fetch-Dest": "document",
-          "Sec-Fetch-Mode": "navigate",
-          "Sec-Fetch-Site": "cross-site",
-          "Upgrade-Insecure-Requests": "1"
-        },
+        headers: requestHeaders,
       });
 
       clearTimeout(timeout);
@@ -43,6 +50,21 @@ async function startServer() {
       if (!response.ok) {
         console.error(`Fetch failed for: ${targetUrl} [Status: ${response.status}]`);
         throw new Error(`Target responded with status: ${response.status}`);
+      }
+
+      // Handle Set-Cookie headers for session persistence
+      const setCookieHeader = response.headers.getSetCookie();
+      if (setCookieHeader && setCookieHeader.length > 0) {
+        const rewrittenCookies = setCookieHeader.map(cookie => {
+          // Force SameSite=None and Secure for iframe compatibility
+          let c = cookie.replace(/SameSite=[^;]+/gi, 'SameSite=None');
+          if (!c.toLowerCase().includes('samesite')) c += '; SameSite=None';
+          if (!c.toLowerCase().includes('secure')) c += '; Secure';
+          // Strip domain to force cookie onto our proxy domain
+          c = c.replace(/Domain=[^;]+/gi, '');
+          return c;
+        });
+        res.setHeader("Set-Cookie", rewrittenCookies);
       }
 
       const contentType = response.headers.get("content-type") || "text/html";

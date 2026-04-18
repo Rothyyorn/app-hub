@@ -14,7 +14,7 @@ export const bookmarks: Bookmark[] = [
   {
     id: 'comatozze',
     name: 'Comatozze Videos',
-    url: 'https://www.pornhub.com/model/comatozze/videos'
+    url: 'https://www.pornhub.com/'
   },
   {
     id: 'google',
