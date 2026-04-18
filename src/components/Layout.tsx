@@ -36,6 +36,12 @@ export default function Layout({ children }: LayoutProps) {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-8">
+              <div className="flex items-center space-x-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 mr-4 border-r border-white/5 pr-8">
+                <span className="text-white/20">Trending:</span>
+                <span className="hover:text-primary cursor-pointer transition-colors">VLXX</span>
+                <span className="hover:text-primary cursor-pointer transition-colors">XVideo</span>
+                <span className="hover:text-primary cursor-pointer transition-colors">Porn</span>
+              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
@@ -89,6 +95,19 @@ export default function Layout({ children }: LayoutProps) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {children}
       </main>
+
+      {/* SEO Footer Section */}
+      <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-white/5 opacity-40">
+        <div className="flex flex-wrap gap-4 text-[10px] font-bold uppercase tracking-[0.3em]">
+          <span className="text-white/20">Popular Searches:</span>
+          <a href="#" className="hover:text-primary transition-colors">Sex Video</a>
+          <a href="#" className="hover:text-primary transition-colors">Porn Video</a>
+          <a href="#" className="hover:text-primary transition-colors">VLXX</a>
+          <a href="#" className="hover:text-primary transition-colors">XVideo</a>
+          <a href="#" className="hover:text-primary transition-colors">Viral Porn</a>
+          <a href="#" className="hover:text-primary transition-colors">Trending Sex</a>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -15,8 +15,9 @@ export default function Home() {
       className="space-y-24"
     >
       <Helmet>
-        <title>Viral Hub | Jerriel Cry4zee (Zyan Cabrera)</title>
-        <meta name="description" content="sex video popurs" />
+        <title>Viral Hub | Best Sex, Porn, VLXX, and XVideo Collection</title>
+        <meta name="description" content="Discover the most popular sex videos, porn content, VLXX, and XVideo favorites. Fast streaming, premium quality, and the latest viral hits in one place." />
+        <meta name="keywords" content="sex video, porn video, vlxx, xvideo, viral video, adult hub, premium porn" />
       </Helmet>
       {/* Grid Section */}
       <section>

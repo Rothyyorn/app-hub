@@ -43,11 +43,13 @@ export default function Post() {
       className="max-w-5xl mx-auto"
     >
       <Helmet>
-        <title>{post.title || 'Viral Post'} | Viral Hub</title>
-        <meta name="description" content={post.excerpt || 'Latest viral video content.'} />
-        <meta property="og:title" content={post.title || 'Viral Post'} />
-        <meta property="og:description" content={post.excerpt || 'Latest viral video content.'} />
+        <title>{post.title || 'Viral Video'} | Viral Hub</title>
+        <meta name="description" content={post.excerpt || 'Watch the latest viral video on Viral Hub. Fast streaming and premium quality.'} />
+        <meta name="keywords" content={`${post.title}, ${post.category}, sex video, porn video, vlxx, xvideo, viral video`} />
+        <meta property="og:title" content={`${post.title} | Viral Hub`} />
+        <meta property="og:description" content={post.excerpt} />
         <meta property="og:image" content={post.coverImage} />
+        <meta property="og:type" content="video.other" />
       </Helmet>
       {/* Header */}
       <header className="space-y-10 mb-16">
