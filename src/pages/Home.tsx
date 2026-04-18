@@ -1,107 +1,50 @@
-import React, { useState } from 'react';
+import { posts } from '../data/posts';
+import PostCard from '../components/PostCard';
+import AdBanner from '../components/AdBanner';
+import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { bookmarks } from '../data/bookmarks';
-import { ExternalLink, Globe, LayoutGrid, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
-import { cn } from '../lib/utils';
 
 export default function Home() {
-  const [activeUrl, setActiveUrl] = useState(bookmarks[0]?.url || '');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  
-  // Use our proxy to bypass X-Frame-Options
-  const proxyUrl = `/api/proxy?url=${encodeURIComponent(activeUrl)}`;
-
   return (
-    <div className="h-[calc(100vh-80px)] w-full bg-[#0D0D0D] flex overflow-hidden">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="space-y-24"
+    >
       <Helmet>
-        <title>SEC | Web Hub</title>
-        <meta name="description" content="Premium adult video hub and web explorer center." />
+        <title>Viral Hub | Jerriel Cry4zee (Zyan Cabrera)</title>
+        <meta name="description" content="sex video popurs" />
       </Helmet>
-
-      {/* Quick Navigation Sidebar */}
-      <div className={cn(
-        "bg-[#111] border-r border-white/5 transition-all duration-500 ease-out flex flex-col relative z-20 shadow-2xl",
-        isSidebarOpen ? "w-72" : "w-16"
-      )}>
-        <div className="p-4 border-b border-white/5 flex items-center justify-between">
-          {isSidebarOpen && <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-primary/80">SEC Hub</span>}
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center text-white/40 transition-colors ml-auto"
-          >
-            {isSidebarOpen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-          </button>
+      {/* Grid Section */}
+      <section>
+        <div className="flex items-center justify-between mb-8">
+          <div className="space-y-1">
+            <h2 className="text-[9px] uppercase tracking-[0.4em] font-bold text-primary">Featured Apps</h2>
+            <p className="text-base font-bold tracking-tight">Latest from the Hub</p>
+          </div>
+          <Link to="/" className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest px-5 py-2.5 bg-white/5 border border-white/10 text-white/60 rounded-full hover:bg-white/10 hover:text-white transition-all">
+            <span>View All</span>
+            <ArrowRight size={12} />
+          </Link>
         </div>
-
-        <div className="flex-grow overflow-y-auto py-4 px-2 space-y-1">
-          {bookmarks.map((site) => (
-            <button
-              key={site.url}
-              onClick={() => setActiveUrl(site.url)}
-              className={cn(
-                "w-full flex items-center space-x-3 p-3 rounded-2xl transition-all group relative",
-                activeUrl === site.url 
-                  ? "bg-primary text-white shadow-xl shadow-primary/20 scale-[1.02]" 
-                  : "text-white/40 hover:bg-white/5 hover:text-white"
-              )}
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+          {posts.map((post, index) => (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 + index * 0.05 }}
             >
-              <div className={cn(
-                "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110",
-                activeUrl === site.url ? "bg-white/20" : "bg-black/40 border border-white/10"
-              )}>
-                <Globe size={14} />
-              </div>
-              
-              {isSidebarOpen && (
-                <div className="flex-grow text-left overflow-hidden">
-                  <p className="text-xs font-bold truncate tracking-tight">{site.name}</p>
-                  <p className="text-[9px] opacity-40 truncate lowercase">{site.url.replace('https://', '')}</p>
-                </div>
-              )}
-
-              {isSidebarOpen && activeUrl === site.url && <ChevronRight size={14} className="opacity-40" />}
-            </button>
+              <PostCard post={post} />
+            </motion.div>
           ))}
         </div>
-
-        <div className="p-4 border-t border-white/5">
-          <div className={cn(
-            "p-3 rounded-2xl bg-white/5 flex items-center space-x-3 transition-opacity",
-            !isSidebarOpen && "opacity-0"
-          )}>
-            <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
-              <LayoutGrid size={14} />
-            </div>
-            <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest">
-              SEC v1.4 Premium
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area (Embedded Viewer) */}
-      <div className="flex-grow relative h-full bg-black">
-        {/* URL Bar Overlay (Small/Minimal) */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 opacity-0 hover:opacity-100 transition-opacity duration-300">
-           <div className="bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full flex items-center space-x-3 shadow-2xl">
-              <Globe size={12} className="text-primary" />
-              <span className="text-[10px] font-medium text-white/60 tracking-tight">{activeUrl}</span>
-              <a href={activeUrl} target="_blank" rel="noreferrer" className="text-white/40 hover:text-white transition-colors">
-                <ExternalLink size={10} />
-              </a>
-           </div>
-        </div>
-
-        <iframe 
-          key={proxyUrl}
-          src={proxyUrl}
-          className="w-full h-full border-none"
-          title="Web Viewer"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-storage-access-by-user-activation"
-          allow="autoplay; fullscreen; picture-in-picture; encrypted-media;"
-        />
-      </div>
-    </div>
+      </section>
+    </motion.div>
   );
 }
 

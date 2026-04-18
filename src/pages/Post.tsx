@@ -56,7 +56,7 @@ export default function Post() {
         </Link>
         
         <div className="space-y-6">
-          <h1 className="text-5xl md:text-8xl font-bold leading-[1] tracking-tight">
+          <h1 className="text-3xl md:text-6xl font-bold leading-[1] tracking-tight">
             {post.title}
           </h1>
         </div>
@@ -119,6 +119,10 @@ export default function Post() {
             loop
             playsInline
             poster={post.coverImage}
+            tracks={post.videoTracks}
+            crossOrigin={post.videoConfig?.crossOrigin}
+            ariaHidden={post.videoConfig?.ariaHidden}
+            tabIndex={post.videoConfig?.tabIndex}
           />
         ) : (
           <img 
