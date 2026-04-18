@@ -86,7 +86,7 @@ async function startServer() {
 
               // 0. Immediate CSS Injection (Zero-Wall)
               const style = document.createElement('style');
-              style.innerHTML = 'div[class*="modal"], div[class*="overlay"], div[id*="modal"], div[id*="overlay"], .join-modal, .registration-modal, .login-modal, #age-verification-container, .age-gate, div[class*="popup"], div[id*="popup"], .modal-dialog, .modal-backdrop, .nudge-container, [class*="AuthModal"], [id*="AuthModal"], div[style*="z-index: 2147483647"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; } html, body { overflow: auto !important; height: auto !important; position: static !important; }';
+              style.innerHTML = 'div[class*="modal"], div[class*="overlay"], div[id*="modal"], div[id*="overlay"], .join-modal, .registration-modal, .login-modal, #age-verification-container, .age-gate, div[class*="popup"], div[id*="popup"], .modal-dialog, .modal-backdrop, .nudge-container, [class*="AuthModal"], [id*="AuthModal"], .verification-modal, .age-verification, div[style*="z-index: 2147483647"], div[style*="z-index: 1000000"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; } html, body { overflow: auto !important; height: auto !important; position: static !important; }';
               document.head ? document.head.appendChild(style) : document.documentElement.appendChild(style);
 
               // 1. Prevent Frame Busting
@@ -223,11 +223,24 @@ async function startServer() {
 
                 // Proactive Wall-Cleaner: Removes late-injected modals every 1s
                 setInterval(() => {
-                  const walls = document.querySelectorAll('.join-modal, .registration-modal, .login-modal, [class*="AuthModal"], [id*="AuthModal"], .modal-backdrop');
+                  const walls = document.querySelectorAll('.join-modal, .registration-modal, .login-modal, [class*="AuthModal"], [id*="AuthModal"], .modal-backdrop, .verification-modal, .age-gate, [id*="verification"]');
                   walls.forEach(w => w.remove());
-                  if (document.body.style.overflow === 'hidden') {
+                  
+                  // Deep-Kill: Find any child of body that contains "Join" and "free" and hide it
+                  Array.from(document.body.children).forEach(child => {
+                    if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'MAIN', 'HEADER', 'FOOTER'].includes(child.tagName)) return;
+                    const text = (child.innerText || child.textContent || "").toLowerCase();
+                    if (text.includes("join xhamster for free") || (text.includes("join") && text.includes("for free") && text.includes("sign up"))) {
+                      child.style.display = 'none';
+                      child.style.visibility = 'hidden';
+                    }
+                  });
+
+                  if (document.body.style.overflow === 'hidden' || document.documentElement.style.overflow === 'hidden') {
                     document.body.style.overflow = 'auto';
+                    document.documentElement.style.overflow = 'auto';
                     document.body.style.height = 'auto';
+                    document.body.style.position = 'static';
                   }
                 }, 1000);
               });
