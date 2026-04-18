@@ -87,18 +87,58 @@ async function startServer() {
                 return originalOpen.apply(this, arguments);
               };
 
-              // 3. Auto-Accept Age Verification
+              // 3. Auto-Accept Age Verification (Secured & Hardened)
               const sessionKey = 'sec_age_accepted_' + btoa(window.location.hostname);
+              function showAutomationBadge(text) {
+                const badge = document.createElement('div');
+                badge.style.cssText = 'position:fixed;top:10px;left:10px;z-index:100000;background:#FF5E00;color:white;padding:6px 12px;border-radius:8px;font:bold 10px sans-serif;text-transform:uppercase;letter-spacing:1px;box-shadow:0 4px 12px rgba(255,94,0,0.3);pointer-events:none;animation:secSlideIn 0.3s ease-out;';
+                badge.innerText = 'SEC AUTO-ACCEPTED: ' + text;
+                document.body.appendChild(badge);
+                
+                const style = document.createElement('style');
+                style.innerHTML = '@keyframes secSlideIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}';
+                document.head.appendChild(style);
+                
+                setTimeout(() => {
+                  badge.style.opacity = '0';
+                  badge.style.transition = 'opacity 0.5s';
+                  setTimeout(() => badge.remove(), 500);
+                }, 3000);
+              }
+
               function autoAccept() {
                 if (sessionStorage.getItem(sessionKey)) return true;
-                const keywords = ["I'M 18", "ENTER", "CONFIRM AGE", "AGREE", "OLDER THAN 18", "YES", "PROCEED"];
-                const buttons = Array.from(document.querySelectorAll('button, a, div[role="button"], span'));
+                
+                const keywords = [
+                  "I'M 18", "I AM 18", "ENTER", "CONFIRM AGE", "AGREE", "OLDER THAN 18", 
+                  "YES", "PROCEED", "I AM AT LEAST 18", "I AGREE", "ENTER SITE", "ADULT CONTENT",
+                  "I'M OVER 18", "I AM OVER 18", "YES, I AM", "CONTINUE TO SITE"
+                ];
+                
+                const buttons = Array.from(document.querySelectorAll('button, a, div[role="button"], span, input[type="button"], input[type="submit"]'));
+                
                 for (const btn of buttons) {
-                  const text = (btn.innerText || "").toUpperCase();
-                  if (keywords.some(k => text.includes(k))) {
-                    sessionStorage.setItem(sessionKey, 'true');
-                    btn.click();
-                    return true;
+                  const text = (btn.innerText || btn.textContent || btn.value || "").trim().toUpperCase();
+                  if (keywords.some(k => text === k || text.includes(k))) {
+                    try {
+                      sessionStorage.setItem(sessionKey, 'true');
+                      showAutomationBadge(text);
+                      
+                      btn.click();
+                      
+                      // Fallback if click() doesn't trigger native listeners
+                      const clickEvent = new MouseEvent('click', {
+                        view: window,
+                        bubbles: true,
+                        cancelable: true
+                      });
+                      btn.dispatchEvent(clickEvent);
+                      
+                      console.log("SEC: Auto-accepted age gate for " + window.location.hostname);
+                      return true;
+                    } catch(e) {
+                      console.error("SEC Proxy: Auto-click failed", e);
+                    }
                   }
                 }
                 return false;
