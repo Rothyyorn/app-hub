@@ -17,7 +17,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
-    // Pass browser cookies to the target site
+    // 1. COOKIE VIRTUALIZATION (Ensures different sites don't clobber each other's sessions)
+    const urlObj = new URL(targetUrl);
+    const domainPrefix = `sec_${urlObj.hostname.replace(/\./g, '_')}_`;
+    
     const requestHeaders: any = {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -34,7 +37,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     };
 
     if (req.headers.cookie) {
-      requestHeaders["Cookie"] = req.headers.cookie;
+      // Extract only the cookies that belong to THIS target domain
+      const cookies = req.headers.cookie.split(';');
+      const filteredCookies = cookies
+        .map(c => c.trim())
+        .filter(c => c.startsWith(domainPrefix))
+        .map(c => c.substring(domainPrefix.length))
+        .join('; ');
+      
+      if (filteredCookies) {
+        requestHeaders["Cookie"] = filteredCookies;
+      }
     }
 
     const response = await fetch(targetUrl, {
@@ -59,18 +72,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       `);
     }
 
-    // Handle Set-Cookie headers for session persistence
+    // Handle Set-Cookie headers for session persistence with Virtualization
     const setCookieHeader = (response.headers as any).getSetCookie?.() || [];
     if (setCookieHeader && setCookieHeader.length > 0) {
       const rewrittenCookies = setCookieHeader.map((cookie: string) => {
-        // Force SameSite=None and Secure for iframe compatibility
-        let c = cookie.replace(/SameSite=[^;]+/gi, 'SameSite=None');
-        if (!c.toLowerCase().includes('samesite')) c += '; SameSite=None';
-        if (!c.toLowerCase().includes('secure')) c += '; Secure';
-        // Strip domain to force cookie onto our proxy domain
-        c = c.replace(/Domain=[^;]+/gi, '');
-        return c;
-      });
+        const parts = cookie.split(';');
+        const firstPart = parts[0];
+        const eqIndex = firstPart.indexOf('=');
+        if (eqIndex === -1) return null;
+
+        const name = firstPart.substring(0, eqIndex).trim();
+        const value = firstPart.substring(eqIndex + 1).trim();
+        
+        // Virtualize the cookie name for THIS domain
+        const virtualName = domainPrefix + name;
+        parts[0] = `${virtualName}=${value}`;
+
+        let rewritten = parts.map(part => {
+          let p = part.trim();
+          if (p.toLowerCase().startsWith('domain=')) return null; 
+          if (p.toLowerCase().startsWith('samesite=')) return 'SameSite=None';
+          if (p.toLowerCase().startsWith('secure')) return 'Secure';
+          return p;
+        }).filter(Boolean).join('; ');
+
+        if (!rewritten.toLowerCase().includes('samesite')) rewritten += '; SameSite=None';
+        if (!rewritten.toLowerCase().includes('secure')) rewritten += '; Secure';
+        
+        return rewritten;
+      }).filter((c: string | null) => c !== null);
+      
       res.setHeader("Set-Cookie", rewrittenCookies);
     }
 

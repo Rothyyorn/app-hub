@@ -24,20 +24,37 @@ async function startServer() {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
-      // Pass browser cookies to the target site
+      // 1. COOKIE VIRTUALIZATION (Ensures different sites don't clobber each other's sessions)
+      const urlObj = new URL(targetUrl);
+      const domainPrefix = `sec_${urlObj.hostname.replace(/\./g, '_')}_`;
+
       const requestHeaders: any = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
         "Accept-Language": "en-US,en;q=0.9",
-        "Referer": targetUrl,
+        "Cache-Control": "max-age=0",
+        "Sec-Ch-Ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
         "Sec-Fetch-Dest": "document",
         "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "cross-site",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
         "Upgrade-Insecure-Requests": "1"
       };
 
       if (req.headers.cookie) {
-        requestHeaders["Cookie"] = req.headers.cookie;
+        // Extract only the cookies that belong to THIS target domain
+        const cookies = req.headers.cookie.split(';');
+        const filteredCookies = cookies
+          .map(c => c.trim())
+          .filter(c => c.startsWith(domainPrefix))
+          .map(c => c.substring(domainPrefix.length))
+          .join('; ');
+        
+        if (filteredCookies) {
+          requestHeaders["Cookie"] = filteredCookies;
+        }
       }
 
       const response = await fetch(targetUrl, {
@@ -49,21 +66,47 @@ async function startServer() {
 
       if (!response.ok) {
         console.error(`Fetch failed for: ${targetUrl} [Status: ${response.status}]`);
-        throw new Error(`Target responded with status: ${response.status}`);
+        return res.status(response.status).send(`
+          <div style="background:#0D0D0D;color:white;font-family:sans-serif;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;">
+            <h1 style="color:#FF5E00;font-size:24px;">PROXY ACCESS DENIED</h1>
+            <p style="opacity:0.6;font-size:14px;max-width:400px;">The target site (${targetUrl}) responded with status ${response.status}. This usually happens when the site blocks cloud provider IPs.</p>
+            <div style="margin-top:20px;padding:15px;background:rgba(255,255,255,0.05);border-radius:12px;font-size:12px;">
+              <strong>Pro Tip:</strong> Try refreshing or using a different bookmark.
+            </div>
+          </div>
+        `);
       }
 
-      // Handle Set-Cookie headers for session persistence
+      // Handle Set-Cookie headers for session persistence with Virtualization
       const setCookieHeader = response.headers.getSetCookie();
       if (setCookieHeader && setCookieHeader.length > 0) {
         const rewrittenCookies = setCookieHeader.map(cookie => {
-          // Force SameSite=None and Secure for iframe compatibility
-          let c = cookie.replace(/SameSite=[^;]+/gi, 'SameSite=None');
-          if (!c.toLowerCase().includes('samesite')) c += '; SameSite=None';
-          if (!c.toLowerCase().includes('secure')) c += '; Secure';
-          // Strip domain to force cookie onto our proxy domain
-          c = c.replace(/Domain=[^;]+/gi, '');
-          return c;
-        });
+          const parts = cookie.split(';');
+          const firstPart = parts[0];
+          const eqIndex = firstPart.indexOf('=');
+          if (eqIndex === -1) return null;
+
+          const name = firstPart.substring(0, eqIndex).trim();
+          const value = firstPart.substring(eqIndex + 1).trim();
+          
+          // Virtualize the cookie name for THIS domain
+          const virtualName = domainPrefix + name;
+          parts[0] = `${virtualName}=${value}`;
+
+          let rewritten = parts.map(part => {
+            let p = part.trim();
+            if (p.toLowerCase().startsWith('domain=')) return null; 
+            if (p.toLowerCase().startsWith('samesite=')) return 'SameSite=None';
+            if (p.toLowerCase().startsWith('secure')) return 'Secure';
+            return p;
+          }).filter(Boolean).join('; ');
+
+          if (!rewritten.toLowerCase().includes('samesite')) rewritten += '; SameSite=None';
+          if (!rewritten.toLowerCase().includes('secure')) rewritten += '; Secure';
+          
+          return rewritten;
+        }).filter(c => c !== null);
+        
         res.setHeader("Set-Cookie", rewrittenCookies);
       }
 
