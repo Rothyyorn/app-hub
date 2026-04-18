@@ -12,7 +12,7 @@ export default function Home() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="space-y-24"
+      className="space-y-12"
     >
       <Helmet>
         <title>SexHub VLXX | Best Sex Video, Porn, VLXX, and XVideo Collection</title>
@@ -32,7 +32,7 @@ export default function Home() {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 md:gap-2">
           {posts.map((post, index) => (
             <motion.div
               key={post.id}
