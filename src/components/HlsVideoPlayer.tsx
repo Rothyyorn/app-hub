@@ -44,62 +44,79 @@ const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !src) return;
 
+    let hls: Hls | null = null;
     let isMounted = true;
 
     const handlePlay = async () => {
       if (!isMounted || !video) return;
       
-      // Apply start time if provided
-      if (startTime > 0) {
-        video.currentTime = startTime;
-      }
-
       try {
+        if (startTime > 0) {
+          video.currentTime = startTime;
+        }
         await video.play();
       } catch (e) {
-        // Only log if it's not the interruption error which is expected on unmount
         if (e instanceof Error && e.name !== 'AbortError' && isMounted) {
-          console.error("Auto-play failed:", e);
+          // Log only unexpected errors, ignore NotAllowedError which is common for multi-tab/blocked autoplay
+          if (e.name !== 'NotAllowedError') {
+            console.error("Auto-play failed:", e.message);
+          }
         }
       }
     };
 
-    if (src.endsWith('.m3u8')) {
+    const isHls = src.toLowerCase().includes('.m3u8');
+
+    if (isHls) {
       if (Hls.isSupported()) {
-        const hls = new Hls();
+        hls = new Hls({
+          enableWorker: true,
+          lowLatencyMode: true,
+        });
         hls.loadSource(src);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          if (autoPlay) {
+          if (autoPlay && isMounted) {
             handlePlay();
           }
         });
-
-        return () => {
-          isMounted = false;
-          hls.destroy();
-        };
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // For Safari
         video.src = src;
         if (autoPlay) {
-          handlePlay();
+          video.addEventListener('loadedmetadata', handlePlay, { once: true });
         }
       }
     } else {
       // Standard video
       video.src = src;
+      video.load(); // Explicitly call load
       if (autoPlay) {
-        handlePlay();
+        // Wait for enough data or metadata to be loaded before playing
+        const onCanPlay = () => {
+          if (isMounted) {
+            handlePlay();
+          }
+          video.removeEventListener('canplay', onCanPlay);
+        };
+        video.addEventListener('canplay', onCanPlay);
       }
     }
 
     return () => {
       isMounted = false;
+      if (hls) {
+        hls.destroy();
+      }
+      if (video) {
+        video.pause();
+        video.src = '';
+        video.load();
+      }
     };
-  }, [src, autoPlay]);
+  }, [src, autoPlay, startTime]);
 
   return (
     <video
@@ -113,6 +130,7 @@ const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
       crossOrigin={crossOrigin}
       aria-hidden={ariaHidden}
       tabIndex={tabIndex}
+      preload="auto"
     >
       {tracks.map((track, index) => (
         <track

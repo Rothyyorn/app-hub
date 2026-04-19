@@ -35,6 +35,10 @@ export default function Post() {
     );
   }
 
+  const isVideoCover = post.coverImage?.match(/\.(mp4|webm|m4v|ogv|mov|m3u8)$/i);
+  const hasValidImageCover = post.coverImage && !post.coverImage.match(/\.(mp4|webm|m4v|ogv|mov|m3u8)$/i);
+  const videoUrlToUse = post.videoUrl || (isVideoCover ? post.coverImage : undefined);
+
   return (
     <motion.article 
       initial={{ opacity: 0 }}
@@ -48,7 +52,7 @@ export default function Post() {
         <meta name="keywords" content={`${post.title}, ${post.category}, sex video, porn video, vlxx, xvideo, viral video`} />
         <meta property="og:title" content={`${post.title} | Viral Hub`} />
         <meta property="og:description" content={post.excerpt} />
-        <meta property="og:image" content={post.coverImage} />
+        <meta property="og:image" content={hasValidImageCover ? post.coverImage : ''} />
         <meta property="og:type" content="video.other" />
       </Helmet>
       {/* Header */}
@@ -67,7 +71,7 @@ export default function Post() {
 
       {/* Featured Image, Video or Web View */}
       <div className={cn(
-        "relative rounded-[3rem] overflow-hidden shadow-2xl shadow-primary/10 border border-white/5 bg-[#1A1A1A] transition-all duration-500",
+        "relative rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl shadow-primary/10 border border-white/5 bg-[#1A1A1A] transition-all duration-500",
         isFullScreen 
           ? "fixed inset-0 z-[100] rounded-none h-screen w-screen" 
           : (post.displayMode === 'iframe' || (!post.displayMode && post.externalUrl)) ? "h-[85vh] min-h-[600px]" : "aspect-video md:aspect-[21/9]"
@@ -111,17 +115,17 @@ export default function Post() {
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
             />
           </div>
-        ) : (post.displayMode === 'video' || (!post.displayMode && post.videoUrl)) && post.videoUrl ? (
+        ) : (post.displayMode === 'video' || (!post.displayMode && videoUrlToUse)) && videoUrlToUse ? (
           <div className="w-full h-full relative">
             <HlsVideoPlayer 
-              src={post.videoUrl}
+              src={videoUrlToUse}
               className="w-full h-full object-cover"
               controls
               autoPlay
               muted
               loop
               playsInline
-              poster={post.coverImage}
+              poster={hasValidImageCover ? post.coverImage : undefined}
               tracks={post.videoTracks}
               crossOrigin={post.videoConfig?.crossOrigin}
               ariaHidden={post.videoConfig?.ariaHidden}

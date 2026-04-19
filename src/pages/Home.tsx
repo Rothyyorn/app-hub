@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { posts } from '../data/posts';
 import PostCard from '../components/PostCard';
 import AdBanner from '../components/AdBanner';
@@ -7,6 +8,10 @@ import { ArrowRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 export default function Home() {
+  const randomizedPosts = useMemo(() => {
+    return [...posts].sort(() => Math.random() - 0.5);
+  }, []);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -33,7 +38,7 @@ export default function Home() {
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 md:gap-2">
-          {posts.map((post, index) => (
+          {randomizedPosts.map((post, index) => (
             <motion.div
               key={post.id}
               initial={{ opacity: 0, scale: 0.9 }}

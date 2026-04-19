@@ -11,6 +11,10 @@ interface PostCardProps {
 
 export default function PostCard({ post, featured = false }: PostCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  
+  const isVideoCover = post.coverImage?.match(/\.(mp4|webm|m4v|ogv|mov|m3u8)$/i) || post.displayMode === 'video' && !post.coverImage;
+  const hasValidImageCover = post.coverImage && !post.coverImage.match(/\.(mp4|webm|m4v|ogv|mov|m3u8)$/i);
+  const videoToPlay = post.videoUrl || (isVideoCover ? post.coverImage : undefined);
 
   if (featured) {
     return (
@@ -21,16 +25,21 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
         className="group relative block overflow-hidden rounded-xl bg-[#111] transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/20 mb-8"
       >
         <div className="aspect-[21/9] overflow-hidden relative">
-          <img 
-            src={post.coverImage} 
-            alt={post.title}
-            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
-            referrerPolicy="no-referrer"
-          />
-          {isHovered && post.videoUrl && (
+          {hasValidImageCover ? (
+            <img 
+              src={post.coverImage} 
+              alt={post.title}
+              className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-full h-full bg-neutral-900" />
+          )}
+
+          {(isHovered || !hasValidImageCover) && videoToPlay && (
             <div className="absolute inset-0 z-10 animate-in fade-in duration-300">
               <HlsVideoPlayer 
-                src={post.videoUrl}
+                src={videoToPlay}
                 className="w-full h-full object-cover"
                 autoPlay
                 muted
@@ -63,17 +72,21 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
       className="group relative block overflow-hidden rounded-lg bg-[#111] transition-all duration-500 hover:scale-105 hover:z-10 hover:shadow-2xl hover:shadow-primary/40"
     >
       <div className="aspect-[16/9] overflow-hidden relative">
-        <img 
-          src={post.coverImage} 
-          alt={post.title}
-          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
-          referrerPolicy="no-referrer"
-        />
+        {hasValidImageCover ? (
+          <img 
+            src={post.coverImage} 
+            alt={post.title}
+            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <div className="w-full h-full bg-neutral-900" />
+        )}
         
-        {isHovered && post.videoUrl && (
+        {(isHovered || !hasValidImageCover) && videoToPlay && (
           <div className="absolute inset-0 z-10 animate-in fade-in duration-300">
             <HlsVideoPlayer 
-              src={post.videoUrl}
+              src={videoToPlay}
               className="w-full h-full object-cover scale-110"
               autoPlay
               muted
