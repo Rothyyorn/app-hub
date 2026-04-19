@@ -112,10 +112,7 @@ export default function Post() {
             />
           </div>
         ) : (post.displayMode === 'video' || (!post.displayMode && post.videoUrl)) && post.videoUrl ? (
-          <div 
-            className="w-full h-full relative cursor-pointer"
-            onClick={() => window.open('https://omg10.com/4/10893687', '_blank')}
-          >
+          <div className="w-full h-full relative">
             <HlsVideoPlayer 
               src={post.videoUrl}
               className="w-full h-full object-cover"
@@ -130,17 +127,6 @@ export default function Post() {
               ariaHidden={post.videoConfig?.ariaHidden}
               tabIndex={post.videoConfig?.tabIndex}
             />
-            <div className="absolute top-4 right-4 z-20 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-              <a 
-                href="https://omg10.com/4/10893687" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-black/60 backdrop-blur-md border border-white/10 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:border-primary transition-all flex items-center space-x-2 shadow-xl"
-              >
-                <span>Open in New Tab</span>
-                <ExternalLink size={12} />
-              </a>
-            </div>
           </div>
         ) : (
           <img 

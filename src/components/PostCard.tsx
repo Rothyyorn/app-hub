@@ -12,15 +12,10 @@ interface PostCardProps {
 export default function PostCard({ post, featured = false }: PostCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleRedirect = () => {
-    window.open('https://omg10.com/4/10893687', '_blank');
-  };
-
   if (featured) {
     return (
       <Link 
         to={`/post/${post.id}`}
-        onClick={handleRedirect}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="group relative block overflow-hidden rounded-xl bg-[#111] transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/20 mb-8"
@@ -63,7 +58,6 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
   return (
     <Link 
       to={`/post/${post.id}`}
-      onClick={handleRedirect}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="group relative block overflow-hidden rounded-lg bg-[#111] transition-all duration-500 hover:scale-105 hover:z-10 hover:shadow-2xl hover:shadow-primary/40"
@@ -95,7 +89,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20" />
       </div>
       <div className="p-0.5">
-        <h3 className="text-[10px] font-bold leading-tight text-white line-clamp-0.5 group-hover:text-primary transition-colors">
+        <h3 className="text-[10px] font-bold leading-tight text-white line-clamp-1 truncate group-hover:text-primary transition-colors">
           {post.title}
         </h3>
       </div>
